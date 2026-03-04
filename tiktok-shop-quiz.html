@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Shop Knowledge Assessment — HiveHQ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f4f5f7;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .header .logo {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .start-screen {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .start-screen .icon { font-size: 48px; margin-bottom: 20px; }
+  .start-screen h2 { font-size: 22px; font-weight: 700; color: #111; margin-bottom: 12px; }
+  .start-screen p { font-size: 15px; color: #555; line-height: 1.6; margin-bottom: 8px; }
+  .start-screen .rules {
+    background: #f8f9fb;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    text-align: left;
+  }
+  .start-screen .rules p { font-size: 14px; color: #444; margin-bottom: 6px; }
+  .start-screen .rules p:last-child { margin-bottom: 0; }
+
+  .name-input-wrap { margin: 24px 0; text-align: left; }
+  .name-input-wrap label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .name-input-wrap input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 15px;
+    border: 2px solid #e0e2e7;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .name-input-wrap input:focus { border-color: #5b4ff5; }
+
+  .btn {
+    display: inline-block;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: #5b4ff5; color: #fff; width: 100%; }
+  .btn-primary:hover { background: #4a3de0; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-email { background: #111; color: #fff; width: 100%; margin-bottom: 12px; }
+  .btn-email:hover { background: #333; transform: translateY(-1px); }
+
+  .progress-bar-wrap { margin-bottom: 24px; }
+  .progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .progress-meta span { font-size: 13px; font-weight: 600; color: #888; }
+  .progress-meta .q-count { color: #5b4ff5; }
+  .progress-bar { height: 6px; background: #e0e2e7; border-radius: 99px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #5b4ff5, #8b7fff);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  .question-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 36px 40px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    margin-bottom: 20px;
+  }
+  .question-number { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #5b4ff5; margin-bottom: 12px; }
+  .question-text { font-size: 17px; font-weight: 600; color: #111; line-height: 1.55; margin-bottom: 28px; }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 2px solid #e8e9ed;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #fff;
+  }
+  .option:hover { border-color: #b0a8f8; background: #faf9ff; }
+  .option.selected { border-color: #5b4ff5; background: #f3f1ff; }
+  .option.correct { border-color: #22c55e; background: #f0fdf4; }
+  .option.incorrect { border-color: #ef4444; background: #fff5f5; }
+  .option.reveal-correct { border-color: #22c55e; background: #f0fdf4; }
+  .option-letter {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: #f0f0f5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #555;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .option.selected .option-letter { background: #5b4ff5; color: #fff; }
+  .option.correct .option-letter { background: #22c55e; color: #fff; }
+  .option.incorrect .option-letter { background: #ef4444; color: #fff; }
+  .option.reveal-correct .option-letter { background: #22c55e; color: #fff; }
+  .option-text { font-size: 15px; color: #333; line-height: 1.5; padding-top: 3px; }
+
+  .feedback {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    display: none;
+  }
+  .feedback.correct-fb { background: #f0fdf4; border-left: 4px solid #22c55e; color: #166534; }
+  .feedback.incorrect-fb { background: #fff5f5; border-left: 4px solid #ef4444; color: #991b1b; }
+
+  .nav-buttons { display: flex; justify-content: flex-end; gap: 12px; }
+
+  .results-screen { display: none; }
+  .score-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    margin-bottom: 24px;
+  }
+  .score-ring {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .score-ring.strong { background: #f0fdf4; border: 6px solid #22c55e; }
+  .score-ring.solid  { background: #fffbeb; border: 6px solid #f59e0b; }
+  .score-ring.gap    { background: #fff5f5; border: 6px solid #ef4444; }
+  .score-ring .score-num { font-size: 36px; font-weight: 800; line-height: 1; color: #111; }
+  .score-ring .score-den { font-size: 14px; color: #888; font-weight: 600; }
+  .score-label { font-size: 22px; font-weight: 700; color: #111; margin-bottom: 8px; }
+  .score-sublabel { font-size: 15px; color: #666; }
+
+  .results-detail {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 40px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    margin-bottom: 24px;
+  }
+  .results-detail h3 {
+    font-size: 16px; font-weight: 700; color: #111;
+    margin-bottom: 20px; padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f5;
+  }
+
+  .answer-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .answer-pip { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .answer-pip .q-num { font-size: 11px; color: #aaa; font-weight: 600; }
+  .answer-pip .pip {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .pip.correct-pip { background: #f0fdf4; }
+  .pip.wrong-pip   { background: #fff5f5; }
+
+  .study-guide h3 {
+    font-size: 16px; font-weight: 700; color: #111;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f5;
+  }
+  .study-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid #f8f8fb;
+  }
+  .study-item:last-child { border-bottom: none; }
+  .study-q-badge {
+    background: #fff0f0; color: #c0392b;
+    font-size: 12px; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px; white-space: nowrap;
+  }
+  .study-item-text { font-size: 14px; color: #444; line-height: 1.5; }
+  .study-item-text strong { color: #111; display: block; margin-bottom: 2px; }
+
+  .results-actions { margin-top: 8px; }
+  .email-note {
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 480px) {
+    .question-card { padding: 24px 20px; }
+    .results-detail { padding: 24px 20px; }
+    .score-card { padding: 28px 20px; }
+    .answer-grid { grid-template-columns: repeat(5, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="logo">HiveHQ</div>
+    <h1>TikTok Shop Assessment</h1>
+    <p>Internal training quiz — complete without notes</p>
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="startScreen" class="start-screen">
+    <div class="icon">📋</div>
+    <h2>Ready to test your knowledge?</h2>
+    <p>This quiz covers the core concepts every HiveHQ team member should know about TikTok Shop.</p>
+    <div class="rules">
+      <p>✦ &nbsp;30 multiple choice questions</p>
+      <p>✦ &nbsp;Complete on your own before checking answers</p>
+      <p>✦ &nbsp;Your score and study plan appear at the end</p>
+      <p>✦ &nbsp;Results can be emailed to your manager when done</p>
+    </div>
+    <div class="name-input-wrap">
+      <label>Your name</label>
+      <input type="text" id="nameInput" placeholder="Enter your name..." />
+    </div>
+    <button class="btn btn-primary" onclick="startQuiz()">Start Quiz →</button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quizScreen" class="hidden">
+    <div class="progress-bar-wrap">
+      <div class="progress-meta">
+        <span id="progressLabel">Question 1 of 30</span>
+        <span class="q-count" id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="question-number" id="questionNumber">Question 1</div>
+      <div class="question-text" id="questionText"></div>
+      <div class="options" id="optionsContainer"></div>
+      <div class="feedback" id="feedbackBox"></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-primary hidden" id="nextBtn" onclick="nextQuestion()">Next →</button>
+      <button class="btn btn-primary hidden" id="submitBtn" onclick="showResults()">See My Results →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen" class="results-screen hidden">
+
+    <div class="score-card">
+      <div class="score-ring" id="scoreRing">
+        <div class="score-num" id="scoreNum">0</div>
+        <div class="score-den">out of 30</div>
+      </div>
+      <div class="score-label" id="scoreLabel"></div>
+      <div class="score-sublabel" id="scoreSublabel"></div>
+    </div>
+
+    <div class="results-detail">
+      <h3>Your answers</h3>
+      <div class="answer-grid" id="answerGrid"></div>
+      <div id="studyGuide"></div>
+    </div>
+
+    <div class="results-actions">
+      <p class="email-note">Send your results directly to your manager — opens your email app with everything pre-filled.</p>
+      <button class="btn btn-email" id="emailBtn" onclick="emailResults()">📧 &nbsp;Send Results to Nina</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const RECIPIENT = "nina@hivehq.ai";
+
+const questions = [
+  // --- ALGORITHM & CONTENT STRATEGY ---
+  {
+    q: "What is the FIRST signal TikTok's algorithm uses to decide whether to distribute your content further?",
+    options: ["Video completion / retention rate", "Likes and comments", "Number of followers", "Posting frequency"],
+    correct: 0,
+    topic: "Algorithm — retention is the first gatekeeper",
+    study: "Rewatch: \"Decoding TikTok Shop's Algorithm for Maximum Sales\""
+  },
+  {
+    q: "Creator A posts 3 highly engaging videos per week with strong retention. Creator B posts 10 videos per week with weak retention. Who is likely to get more distribution from TikTok?",
+    options: ["Creator B — volume always wins on TikTok", "It's equal — TikTok treats all content the same", "Creator A — quality engagement signals drive distribution more than raw volume", "Neither — only paid ads get reliable distribution"],
+    correct: 2,
+    topic: "Content quality vs. posting volume",
+    study: "Rewatch: Creator interview (quality vs. quantity section)"
+  },
+  {
+    q: "True or False: Hashtags are the primary driver of TikTok content distribution.",
+    options: ["False — behavioral signals like retention and CTR drive distribution far more than hashtags", "True"],
+    correct: 0,
+    topic: "Hashtags are secondary, not the primary distribution driver",
+    study: "Rewatch: \"Decoding TikTok Shop's Algorithm for Maximum Sales\""
+  },
+  {
+    q: "Why does \"staying in a content lane\" matter for the TikTok algorithm?",
+    options: ["It helps you avoid copyright issues", "It trains the algorithm to understand your audience so it consistently serves your content to the right people", "TikTok penalizes accounts that post about multiple topics", "It reduces the cost of running paid ads"],
+    correct: 1,
+    topic: "Content lanes train the algorithm",
+    study: "Rewatch: \"Decoding TikTok Shop's Algorithm for Maximum Sales\""
+  },
+  {
+    q: "What is \"value stacking\" in TikTok Shop content?",
+    options: ["Stacking multiple products in one video to increase average order value", "Using multiple hashtags to reach more audiences simultaneously", "Layering multiple benefits, bonuses, or proof points into a CTA to make the offer feel irresistible", "Running GMV Max and organic content at the same time"],
+    correct: 2,
+    topic: "Value stacking — CTA technique",
+    study: "Rewatch: Creator interview (CTA and conversion section)"
+  },
+  {
+    q: "What does the 80/20 rule mean in the context of TikTok Shop LIVE sessions?",
+    options: ["Spend 80% of your budget on paid lives and 20% on organic", "80% of live revenue comes from 20% of your viewers", "Go live 80% of the week and rest 20%", "80% of your live session should provide value (education/entertainment) and only 20% should be direct selling"],
+    correct: 3,
+    topic: "Live strategy — 80/20 value vs. sell ratio",
+    study: "Rewatch: \"How to Launch a TikTok Shop Product\""
+  },
+  // --- CREATOR & AFFILIATE MANAGEMENT ---
+  {
+    q: "In a conservative product launch, approximately how many creator samples per SKU should you send?",
+    options: ["300–400", "50–100", "100–200", "1,000+"],
+    correct: 0,
+    topic: "Conservative launch — 300–400 samples per SKU",
+    study: "Rewatch: \"How to Launch a TikTok Shop Product\""
+  },
+  {
+    q: "Which best describes an aggressive product launch strategy in month one?",
+    options: ["Send 300–400 samples and target a 1.5x GMV Max ROI", "Focus only on paid GMV Max and skip organic creator outreach", "Launch 10+ SKUs simultaneously to maximize data", "Send 800–1,000+ samples, engage 25–30 retainer creators, and target 2,000+ shoppable videos"],
+    correct: 3,
+    topic: "Aggressive launch — month one strategy",
+    study: "Rewatch: \"How to Launch a TikTok Shop Product\""
+  },
+  {
+    q: "What is a retainer creator?",
+    options: ["A creator who has been on the platform for more than 2 years", "A creator who receives a fixed monthly payment plus commission in exchange for a guaranteed posting commitment", "A creator who only promotes products they personally own", "A creator enrolled in TikTok's Star Creator program"],
+    correct: 1,
+    topic: "Retainer creators — definition and purpose",
+    study: "Rewatch: \"How to Launch a TikTok Shop Product\" + JoySpring case study"
+  },
+  {
+    q: "A creator received your samples 3 weeks ago and hasn't posted. What's the best move?",
+    options: ["Send a personalized reactivation message and offer a new incentive or product", "Remove them from the program — time is money", "Increase their commission to 70% immediately", "Wait — creators post on their own timeline and shouldn't be pressured"],
+    correct: 0,
+    topic: "Creator reactivation — high ROI activity",
+    study: "Rewatch: \"The Secret Affiliate Software Powering Brands\" + JoySpring case study"
+  },
+  {
+    q: "When building a creator community (e.g., on Discord), what motivational structure was highlighted as most effective?",
+    options: ["Flat commission for everyone to keep things fair", "Requiring all creators to sign exclusivity agreements", "Tiered incentives based on performance — GMV-based commission tiers, bonuses, and leaderboards", "Replacing lower-performing creators every 30 days"],
+    correct: 2,
+    topic: "Creator community — tiered incentive structures",
+    study: "Rewatch: Neuro/Kent Yoshimura interview + JoySpring case study"
+  },
+  {
+    q: "What is the benefit of giving creators multiple product cards in an affiliate campaign?",
+    options: ["It forces creators to promote every product equally for maximum coverage", "It gives creators flexibility to promote whichever product resonates with their audience, increasing conversion chances", "Multiple product cards automatically increase the commission payout per creator", "Multiple product cards are only used in paid brand partnerships"],
+    correct: 1,
+    topic: "Affiliate campaigns — multiple product cards",
+    study: "Rewatch: \"The Secret Affiliate Software Powering Brands\""
+  },
+  // --- GMV MAX & ADVERTISING ---
+  {
+    q: "What is GMV Max?",
+    options: ["A manual bidding system for TikTok paid ads", "A creator incentive program for top affiliates", "A metric measuring total revenue after refunds", "TikTok's smart bidding/automated campaign system that optimizes for maximum gross merchandise value"],
+    correct: 3,
+    topic: "GMV Max — definition",
+    study: "Rewatch: Neuro/Kent Yoshimura interview + BFCM video"
+  },
+  {
+    q: "According to the training content, approximately what percentage of top TikTok Shop brands' sales now flows through GMV Max?",
+    options: ["90%+", "30–40%", "50–60%", "70–80%"],
+    correct: 0,
+    topic: "GMV Max — 90%+ of top brand sales",
+    study: "Rewatch: Neuro/Kent Yoshimura interview"
+  },
+  {
+    q: "What does switching GMV Max to \"delivery mode\" accomplish during a sale event like BFCM?",
+    options: ["It pauses all bidding to protect ROI margins", "It targets only returning customers to improve efficiency", "It automatically switches to image ads for faster load times", "It maximizes spend and delivery velocity to capture peak demand, even if ROI temporarily dips"],
+    correct: 3,
+    topic: "GMV Max delivery mode — peak period strategy",
+    study: "Rewatch: \"TikTok Shop Black Friday & Cyber Monday 2025\""
+  },
+  // --- KPI BENCHMARKS ---
+  {
+    q: "What is the target conversion rate range for a healthy TikTok Shop product page?",
+    options: ["0.5–1%", "1–2%", "2–4%", "5–8%"],
+    correct: 2,
+    topic: "KPI — Conversion rate benchmark: 2–4%",
+    study: "Rewatch: \"TikTok Shop KPI Benchmarks\""
+  },
+  {
+    q: "What is the minimum Shop Performance Score you must maintain to avoid losing traffic and visibility?",
+    options: ["3.0", "3.5", "4.0", "4.5"],
+    correct: 3,
+    topic: "KPI — Shop Performance Score minimum: 4.5",
+    study: "Rewatch: \"TikTok Shop KPI Benchmarks\""
+  },
+  {
+    q: "What is the minimum review rating you should maintain on TikTok Shop to protect conversion and visibility?",
+    options: ["4.0", "3.5", "4.5", "4.8"],
+    correct: 0,
+    topic: "KPI — Review rating minimum: 4.0",
+    study: "Rewatch: \"TikTok Shop KPI Benchmarks\""
+  },
+  {
+    q: "What does CPO stand for and what does it measure?",
+    options: ["Content Performance Output — videos posted per week", "Cost Per Order — how much you spend to generate each purchase", "Creator Payout Obligation — minimum commission owed to affiliates", "Conversion Point Optimization — a GMV Max bidding strategy"],
+    correct: 1,
+    topic: "KPI — CPO = Cost Per Order",
+    study: "Rewatch: \"TikTok Shop KPI Benchmarks\""
+  },
+  {
+    q: "True or False: Gross GMV is the most accurate metric for measuring TikTok Shop revenue performance.",
+    options: ["False — GMV net of refunds is more accurate because it reflects what you actually retained", "True"],
+    correct: 0,
+    topic: "KPI — Net GMV vs. Gross GMV",
+    study: "Rewatch: \"TikTok Shop KPI Benchmarks\""
+  },
+  {
+    q: "For subscription products on TikTok Shop, which benchmarks should you be targeting?",
+    options: ["5–7% take rate and 60% monthly retention", "12–15% take rate and 70% monthly retention", "9–11% take rate and 80%+ monthly retention", "Subscription metrics don't apply to TikTok Shop"],
+    correct: 2,
+    topic: "KPI — Subscription: 9–11% take rate, 80%+ retention",
+    study: "Rewatch: \"TikTok Shop KPI Benchmarks\""
+  },
+  // --- AFFILIATE AUTOMATION ---
+  {
+    q: "Why is automated follow-up critical in a creator affiliate program?",
+    options: ["It automatically increases commission rates for top performers", "It replaces the need to send physical product samples", "It monitors creator posts and flags non-compliant content", "Many creators receive samples but go quiet — automated sequences re-engage them and convert wasted sample spend into live content"],
+    correct: 3,
+    topic: "Affiliate automation — follow-up sequences",
+    study: "Rewatch: \"The Secret Affiliate Software Powering Brands\""
+  },
+  // --- BRAND BUILDING & CROSS-CHANNEL ---
+  {
+    q: "Kent Yoshimura (Neuro) described TikTok Shop as a marketing channel, not just a sales channel. What does that mean for how you measure ROI?",
+    options: ["TikTok Shop should replace all other paid advertising channels", "The direct TikTok revenue isn't the only value — content drives spillover sales on Amazon, DTC, and retail, so true ROI must account for all channels", "Marketing content on TikTok should never include direct product links", "TikTok Shop is only valuable for brand awareness, not actual conversions"],
+    correct: 1,
+    topic: "TikTok as a cross-channel marketing engine",
+    study: "Rewatch: Neuro / Kent Yoshimura interview"
+  },
+  {
+    q: "What is the Amazon Halo Effect?",
+    options: ["Amazon's algorithm for boosting TikTok-advertised products in search results", "A co-marketing program between Amazon and TikTok", "The phenomenon where TikTok content drives consumers to discover a brand and then purchase on Amazon", "The impact of Amazon reviews on TikTok Shop conversion rates"],
+    correct: 2,
+    topic: "Amazon Halo Effect — cross-channel attribution",
+    study: "Rewatch: Neuro / Kent Yoshimura interview"
+  },
+  {
+    q: "What was the strategic rationale behind Neuro partnering with celebrities like Andrew Schulz and Joe Rogan?",
+    options: ["To build brand credibility and expand reach beyond TikTok — including Amazon, podcasts, and retail", "Celebrity partners always guarantee viral TikTok content", "Celebrities are always cheaper than micro-creators at scale", "Celebrities provide guaranteed minimum purchase orders"],
+    correct: 0,
+    topic: "Celebrity partnerships — brand credibility and reach",
+    study: "Rewatch: Neuro / Kent Yoshimura interview"
+  },
+  // --- CASE STUDIES ---
+  {
+    q: "According to the JoySpring case study, what was one of their biggest early operational mistakes?",
+    options: ["Setting commission too low to attract quality creators", "Not investing in GMV Max early enough", "Focusing only on English-speaking creators from the start", "Being unprepared for the volume TikTok drove — they ran out of inventory"],
+    correct: 3,
+    topic: "JoySpring — supply chain unpreparedness for TikTok volume",
+    study: "Rewatch: \"TikTok Shop Secrets — How JoySpring Scaled\""
+  },
+  {
+    q: "What is EOS (Entrepreneurial Operating System) and why did Fernando credit it with helping him scale?",
+    options: ["An Amazon seller tool for managing inventory and FBA shipments", "A business framework for setting goals, defining accountability, and executing systematically as a company grows", "A TikTok analytics platform for tracking creator performance", "A social media scheduling tool used by top TikTok Shop brands"],
+    correct: 1,
+    topic: "EOS — operational framework for scaling",
+    study: "Rewatch: \"How I Went From Broke to Building a $40M\""
+  },
+  // --- BFCM & SEASONAL STRATEGY ---
+  {
+    q: "When should you start ramping up your TikTok Shop BFCM preparation?",
+    options: ["The week of Black Friday", "November 1st", "2–3 weeks before November 12th — TikTok's official BFCM campaign start date", "December 1st, focused on Cyber Monday"],
+    correct: 2,
+    topic: "BFCM — start ramping 2–3 weeks before Nov 12",
+    study: "Rewatch: \"TikTok Shop Black Friday & Cyber Monday 2025\""
+  },
+  {
+    q: "What is the recommended product strategy for BFCM to increase average order value?",
+    options: ["Reduce to a single hero SKU to simplify logistics", "Only offer discounts through paid ads, not on the organic shop page", "Create bundle variants (e.g., 2-packs, combo sets) specifically for BFCM", "Avoid bundles — they confuse the algorithm"],
+    correct: 2,
+    topic: "BFCM — bundle variants to increase AOV",
+    study: "Rewatch: \"TikTok Shop Black Friday & Cyber Monday 2025\""
+  },
+  {
+    q: "What does FBT (Fulfilled By TikTok) mean and why is it especially recommended for BFCM?",
+    options: ["A TikTok co-marketing program that promotes your products in search results", "A creator fulfillment system where creators ship products directly to buyers", "A bundled ad format that combines video and product listing ads", "TikTok handles storage and fulfillment of your inventory — ensuring fast, reliable delivery during high-volume periods and protecting your shop score"],
+    correct: 3,
+    topic: "FBT — TikTok fulfillment for peak periods",
+    study: "Rewatch: \"TikTok Shop Black Friday & Cyber Monday 2025\""
+  },
+  {
+    q: "Which of the following is NOT recommended as part of a BFCM TikTok Shop strategy?",
+    options: ["Joining TikTok's official BFCM campaign AND the flash sales campaign separately", "Waiting until Black Friday itself to launch your creator content push", "Creating bundle variants to increase average order value", "Switching GMV Max to delivery mode during the peak sale window"],
+    correct: 1,
+    topic: "BFCM — what NOT to do (waiting too long)",
+    study: "Rewatch: \"TikTok Shop Black Friday & Cyber Monday 2025\""
+  }
+];
+
+let currentQ = 0;
+let score = 0;
+let answered = [];
+let userName = "";
+
+function startQuiz() {
+  userName = document.getElementById("nameInput").value.trim() || "Team Member";
+  document.getElementById("startScreen").classList.add("hidden");
+  document.getElementById("quizScreen").classList.remove("hidden");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  const letters = ["A", "B", "C", "D"];
+
+  document.getElementById("questionNumber").textContent = "Question " + (currentQ + 1);
+  document.getElementById("questionText").textContent = q.q;
+  document.getElementById("progressLabel").textContent = "Question " + (currentQ + 1) + " of " + questions.length;
+
+  const pct = Math.round((currentQ / questions.length) * 100);
+  document.getElementById("progressPct").textContent = pct + "%";
+  document.getElementById("progressFill").style.width = pct + "%";
+
+  const container = document.getElementById("optionsContainer");
+  container.innerHTML = "";
+
+  q.options.forEach((opt, i) => {
+    const div = document.createElement("div");
+    div.className = "option";
+    div.id = "opt_" + i;
+    div.onclick = () => selectAnswer(i);
+    div.innerHTML = `<div class="option-letter">${letters[i]}</div><div class="option-text">${opt}</div>`;
+    container.appendChild(div);
+  });
+
+  const fb = document.getElementById("feedbackBox");
+  fb.style.display = "none";
+  fb.className = "feedback";
+
+  document.getElementById("nextBtn").classList.add("hidden");
+  document.getElementById("submitBtn").classList.add("hidden");
+}
+
+function selectAnswer(selected) {
+  if (document.getElementById("opt_0").style.pointerEvents === "none") return;
+
+  const q = questions[currentQ];
+  const isCorrect = selected === q.correct;
+  const letters = ["A", "B", "C", "D"];
+
+  for (let i = 0; i < q.options.length; i++) {
+    document.getElementById("opt_" + i).style.pointerEvents = "none";
+  }
+
+  const selectedEl = document.getElementById("opt_" + selected);
+  if (isCorrect) {
+    selectedEl.classList.add("correct");
+  } else {
+    selectedEl.classList.add("incorrect");
+    document.getElementById("opt_" + q.correct).classList.add("reveal-correct");
+  }
+
+  const fb = document.getElementById("feedbackBox");
+  if (isCorrect) {
+    fb.className = "feedback correct-fb";
+    fb.textContent = "✓ Correct!";
+    score++;
+  } else {
+    fb.className = "feedback incorrect-fb";
+    fb.textContent = "✗ Not quite. The correct answer is " + letters[q.correct] + ".";
+  }
+  fb.style.display = "block";
+
+  answered[currentQ] = { selected, correct: isCorrect };
+
+  if (currentQ < questions.length - 1) {
+    document.getElementById("nextBtn").classList.remove("hidden");
+  } else {
+    document.getElementById("submitBtn").classList.remove("hidden");
+  }
+}
+
+function nextQuestion() {
+  currentQ++;
+  renderQuestion();
+}
+
+function showResults() {
+  document.getElementById("quizScreen").classList.add("hidden");
+  document.getElementById("resultsScreen").classList.remove("hidden");
+  document.getElementById("resultsScreen").style.display = "block";
+
+  const pct = Math.round((score / questions.length) * 100);
+
+  const ring = document.getElementById("scoreRing");
+  const label = document.getElementById("scoreLabel");
+  const sub = document.getElementById("scoreSublabel");
+  document.getElementById("scoreNum").textContent = score;
+
+  let statusText = "";
+  if (pct >= 90) {
+    ring.className = "score-ring strong";
+    label.textContent = "Strong — ready to execute";
+    sub.textContent = userName + ", you have a solid command of TikTok Shop fundamentals.";
+    statusText = "Strong (90%+)";
+  } else if (pct >= 70) {
+    ring.className = "score-ring solid";
+    label.textContent = "Solid — a few areas to tighten up";
+    sub.textContent = userName + ", good foundation. Review the topics below to fill the gaps.";
+    statusText = "Solid (70–89%)";
+  } else {
+    ring.className = "score-ring gap";
+    label.textContent = "Gaps identified — time to study";
+    sub.textContent = userName + ", use the study guide below to prioritize your review.";
+    statusText = "Gaps identified (below 70%)";
+  }
+
+  // Answer grid
+  const grid = document.getElementById("answerGrid");
+  grid.innerHTML = "";
+  answered.forEach((a, i) => {
+    const pip = document.createElement("div");
+    pip.className = "answer-pip";
+    pip.innerHTML = `<div class="q-num">Q${i+1}</div><div class="pip ${a.correct ? 'correct-pip' : 'wrong-pip'}">${a.correct ? '✓' : '✗'}</div>`;
+    grid.appendChild(pip);
+  });
+
+  // Study guide
+  const wrong = answered.map((a, i) => ({ ...a, i })).filter(a => !a.correct);
+  const guideEl = document.getElementById("studyGuide");
+
+  if (wrong.length === 0) {
+    guideEl.innerHTML = `<div style="text-align:center;padding:16px 0;color:#22c55e;font-weight:600;font-size:15px;">🎉 Perfect score — nothing to review!</div>`;
+  } else {
+    let html = `<div class="study-guide"><h3>Study plan — ${wrong.length} question${wrong.length > 1 ? 's' : ''} to review</h3>`;
+    wrong.forEach(w => {
+      const q = questions[w.i];
+      html += `<div class="study-item"><div class="study-q-badge">Q${w.i + 1}</div><div class="study-item-text"><strong>${q.topic}</strong>${q.study}</div></div>`;
+    });
+    html += `</div>`;
+    guideEl.innerHTML = html;
+  }
+
+  // Store for email
+  window._quizState = { userName, score, pct, statusText, wrong };
+}
+
+function emailResults() {
+  const { userName, score, pct, statusText, wrong } = window._quizState || {};
+  const total = questions.length;
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const subject = encodeURIComponent(`TikTok Shop Quiz Results — ${userName}`);
+
+  let body = `Hi Nina,\n\nHere are my TikTok Shop Knowledge Assessment results:\n\n`;
+  body += `Name: ${userName}\n`;
+  body += `Date: ${date}\n`;
+  body += `Score: ${score} / ${total} (${pct}%)\n`;
+  body += `Status: ${statusText}\n\n`;
+
+  if (wrong && wrong.length > 0) {
+    body += `--- Questions Missed ---\n`;
+    wrong.forEach(w => {
+      const q = questions[w.i];
+      body += `\nQ${w.i + 1}: ${q.topic}\n→ ${q.study}\n`;
+    });
+  } else {
+    body += `Perfect score — no questions missed!\n`;
+  }
+
+  body += `\n---\nSent from the HiveHQ TikTok Shop Assessment`;
+
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(RECIPIENT)}&su=${subject}&body=${encodeURIComponent(body)}`;
+  window.open(gmailUrl, '_blank');
+}
+
+</script>
+</body>
+</html>
